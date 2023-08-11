@@ -6,9 +6,9 @@ import pandas as pd
 import json
 
 def main():
-    story_graph = nx.read_edgelist("story.edgelist",delimiter = ",")
+    story_graph = nx.read_edgelist("config/story.edgelist",delimiter = ",")
    
-    with open("storynodeprops.json") as f:
+    with open("config/storynodeprops.json") as f:
         storyprops = json.load(f)
     G = build_lattice_graph(30)
     alignment_df = pd.DataFrame()
@@ -25,7 +25,7 @@ def main():
                 alignments.append(0)
         alignment_df[sn] = alignments
     
-    Simulation(story_graph=story_graph,social_graph=G,agent_alignments=alignment_df).run(100)
+    Simulation(story_graph=story_graph,social_graph=G,agent_alignments=alignment_df).run(50)
 
 
 def build_lattice_graph(n):

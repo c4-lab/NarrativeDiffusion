@@ -39,10 +39,8 @@ class Simulation:
                 alpha=self.params["alpha"],
                 beta=self.params["beta"],
                 gamma=self.params["gamma"],
-                tau=self.params["tau"],
-                xi=self.params["xi"],
                 I_scale = self.params["I_scale"],
-                I_shift = self.params["I_shift"],
+                epsilon = self.params["epsilon"],
                 alignments=self.agent_alignments.iloc[agent_id].to_dict(),
                 seed_adoptions = story_nodes[:self.params['seed']]
             )
@@ -53,18 +51,16 @@ class Simulation:
     def _load_params_from_file(self, filename="simulation.properties"):
         """Load parameters from a properties file using configparser."""
         config = configparser.ConfigParser()
-        config.read(filename)
+        config.read(f"./config/{filename}")
         
         # Extract parameters and return as a dictionary
         params = {
             "alpha": config.getfloat("DEFAULT", "alpha"),
             "beta": config.getfloat("DEFAULT", "beta"),
             "gamma": config.getfloat("DEFAULT", "gamma"),
-            "tau": config.getfloat("DEFAULT", "tau"),
-            "xi": config.getfloat("DEFAULT", "xi"),
             "filestub": config.get("DEFAULT", "filestub"),
             "I_scale": config.getfloat("DEFAULT","I_scale"),
-            "I_shift": config.getfloat("DEFAULT","I_shift"),
+            "epsilon": config.getfloat("DEFAULT","epsilon"),
             "viral" : config.getboolean("DEFAULT","viral"),
             "seed" : config.getint("DEFAULT", "seed"),
             "N": config.getint("DEFAULT", "N")
@@ -123,7 +119,7 @@ class Simulation:
     def save_results(self):
         """Save the results, parameters, networks, and agent alignments."""
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        directory = f"{self.params['filestub']}_{timestamp}"
+        directory = f"data/{self.params['filestub']}_{timestamp}"
         
         # Create the directory
         os.makedirs(directory, exist_ok=True)
