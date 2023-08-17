@@ -36,3 +36,5 @@ env/
 
 # Other files
 data/
+
+.DS_Store

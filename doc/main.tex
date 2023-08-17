@@ -1,0 +1,181 @@
+%Version 2.1 April 2023
+% See section 11 of the User Manual for version history
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                                                 %%
+%% Please do not use \input{...} to include other tex files.       %%
+%% Submit your LaTeX manuscript as one .tex document.              %%
+%%                                                                 %%
+%% All additional figures and files should be attached             %%
+%% separately and not embedded in the \TeX\ document itself.       %%
+%%                                                                 %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%\documentclass[referee,sn-basic]{sn-jnl}% referee option is meant for double line spacing
+
+%%=======================================================%%
+%% to print line numbers in the margin use lineno option %%
+%%=======================================================%%
+
+%%\documentclass[lineno,sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
+
+%%======================================================%%
+%% to compile with pdflatex/xelatex use pdflatex option %%
+%%======================================================%%
+
+%%\documentclass[pdflatex,sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
+
+
+%%Note: the following reference styles support Namedate and Numbered referencing. By default the style follows the most common style. To switch between the options you can add or remove Numbered in the optional parenthesis. 
+%%The option is available for: sn-basic.bst, sn-vancouver.bst, sn-chicago.bst, sn-mathphys.bst. %  
+ 
+%%\documentclass[sn-nature]{sn-jnl}% Style for submissions to Nature Portfolio journals
+%%\documentclass[sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
+\documentclass[sn-mathphys,Numbered]{sn-jnl}% Math and Physical Sciences Reference Style
+%%\documentclass[sn-aps]{sn-jnl}% American Physical Society (APS) Reference Style
+%%\documentclass[sn-vancouver,Numbered]{sn-jnl}% Vancouver Reference Style
+%%\documentclass[sn-apa]{sn-jnl}% APA Reference Style 
+%%\documentclass[sn-chicago]{sn-jnl}% Chicago-based Humanities Reference Style
+%%\documentclass[default]{sn-jnl}% Default
+%%\documentclass[default,iicol]{sn-jnl}% Default with double column layout
+
+%%%% Standard Packages
+%%<additional latex packages if required can be included here>
+
+\usepackage{graphicx}%
+\usepackage{multirow}%
+\usepackage{amsmath,amssymb,amsfonts}%
+\usepackage{amsthm}%
+\usepackage{mathrsfs}%
+\usepackage[title]{appendix}%
+\usepackage{xcolor}%
+\usepackage{textcomp}%
+\usepackage{manyfoot}%
+\usepackage{booktabs}%
+\usepackage{algorithm}%
+\usepackage{algorithmicx}%
+\usepackage{algpseudocode}%
+\usepackage{listings}%
+%%%%
+
+%%%%%=============================================================================%%%%
+%%%%  Remarks: This template is provided to aid authors with the preparation
+%%%%  of original research articles intended for submission to journals published 
+%%%%  by Springer Nature. The guidance has been prepared in partnership with 
+%%%%  production teams to conform to Springer Nature technical requirements. 
+%%%%  Editorial and presentation requirements differ among journal portfolios and 
+%%%%  research disciplines. You may find sections in this template are irrelevant 
+%%%%  to your work and are empowered to omit any such section if allowed by the 
+%%%%  journal you intend to submit to. The submission guidelines and policies 
+%%%%  of the journal take precedence. A detailed User Manual is available in the 
+%%%%  template package for technical guidance.
+%%%%%=============================================================================%%%%
+
+%\jyear{2021}%
+
+%% as per the requirement new theorem styles can be included as shown below
+\theoremstyle{thmstyleone}%
+\newtheorem{theorem}{Theorem}%  meant for continuous numbers
+%%\newtheorem{theorem}{Theorem}[section]% meant for sectionwise numbers
+%% optional argument [theorem] produces theorem numbering sequence instead of independent numbers for Proposition
+\newtheorem{proposition}[theorem]{Proposition}% 
+%%\newtheorem{proposition}{Proposition}% to get separate numbers for theorem and proposition etc.
+
+\theoremstyle{thmstyletwo}%
+\newtheorem{example}{Example}%
+\newtheorem{remark}{Remark}%
+
+\theoremstyle{thmstylethree}%
+\newtheorem{definition}{Definition}%
+
+\raggedbottom
+%%\unnumbered% uncomment this for unnumbered level heads
+
+\begin{document}
+\title{A Graph-Theoretical Approach to Information Adoption in Narrative Structures}
+
+
+%%=============================================================%%
+%% Prefix	-> \pfx{Dr}
+%% GivenName	-> \fnm{Joergen W.}
+%% Particle	-> \spfx{van der} -> surname prefix
+%% FamilyName	-> \sur{Ploeg}
+%% Suffix	-> \sfx{IV}
+%% NatureName	-> \tanm{Poet Laureate} -> Title after name
+%% Degrees	-> \dgr{MSc, PhD}
+%% \author*[1,2]{\pfx{Dr} \fnm{Joergen W.} \spfx{van der} \sur{Ploeg} \sfx{IV} \tanm{Poet Laureate} 
+%%                 \dgr{MSc, PhD}}\email{iauthor@gmail.com}
+%%=============================================================%%
+
+\author*[1]{\fnm{Joshua} \sur{Introne}}\email{jeintron@syr.edu}
+\equalcont{These authors contributed equally to this work.}
+
+\author[1]{\fnm{Qiusi} \sur{Sun}}\email{qsun12@syr.edu}
+\equalcont{These authors contributed equally to this work.}
+
+\affil*[1]{\orgdiv{School of Information Studies}, \orgname{Syracuse University}, \orgaddress{\street{Hinds Hall}, \city{Syracuse}, \postcode{13244}, \state{NY}, \country{USA}}}
+
+%%==================================%%
+%% sample for unstructured abstract %%
+%%==================================%%
+
+\abstract{Something about narrative adoption in the context of misinformation.}
+
+%%================================%%
+%% Sample for structured abstract %%
+%%================================%%
+
+% \abstract{\textbf{Purpose:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
+% 
+% \textbf{Methods:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
+% 
+% \textbf{Results:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
+% 
+% \textbf{Conclusion:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.}
+
+\keywords{keyword1, Keyword2, Keyword3, Keyword4}
+
+%%\pacs[JEL Classification]{D8, H51}
+
+%%\pacs[MSC Classification]{35A01, 65L10, 65L12, 65L20, 65L70}
+
+\maketitle
+
+\section{Introduction}
+Understanding the comprehension and assimilation of narrative information remains a cornerstone of cognitive research. Extending on the foundational work by Trabasso et al., which postulates a correlation between memory of story elements and their centrality in a causal network representation, we propose an enriched mathematical model. This model captures the likelihood of adopting an information item considering not just its position in the narrative's causal network, but also the combined effects of social influence and personal alignment.
+
+\section{Methodology}
+
+\subsection{Graph Representation}
+Narratives are conceptualized as a graph \(G\), with each story item, denoted \(s_i\), being a node. The adjacency matrix \(A\) captures the causal relationships in the narrative. Although derived potentially from a directed graph, our emphasis is solely on undirected path lengths.
+
+In the following, all equations are written from the perspective of a single agent $p_n$.
+
+
+\subsection{Narrative Influence (W)}
+The potential influence of a story element $s_i$ based on its position in the narrative is given by:
+\[ W(s_i) = \frac{1}{|S_t|} \sum_{s_j \in S_t} \frac{1}{d(s_i, s_j) + 1} \]
+where \( S_t \) is the set of story items adopted by $p_n$ at time \( t \) and \( d(s_i, s_j) \) is the distance between story items \( s_i \) and \( s_j \) in the narrative graph.
+
+\subsection{Social Influence (I)}
+The influence of social adoption is described as:
+\[ I(s_i) = \frac{2}{1 + e^{-\iota n_i}} -1\]
+where \( n_i \) is the number of neighbors of $p_n$ that have already adopted the story item $s_i$.
+
+\subsection{Alignment (A)}
+The individual alignment of $p_n$ with a story element is:
+\[ A(s_i) = \frac{1 + a_i}{2} \]
+where \( a_i \) is the alignment value of the story item, ranging from -1 to 1.
+
+\subsection{Adoption Probability}
+Given the weights \( \alpha \), \( \beta \), and \( \gamma \) with the constraint \( \alpha + \beta + \gamma = 1 \):
+\[ P'(s_{i,t+1}|S_t,A) = \alpha W(s_i) + \beta I(s_i) + \gamma A(s_i) \]
+
+
+\section{Discussion}
+This model offers a holistic view of narrative adoption, entwining story structure with social dynamics and personal beliefs. While eigenvector and betweenness centrality provide insights into network positioning, our model enriches this understanding by accounting for external influences and intrinsic inclinations.
+
+\section{Conclusion}
+In capturing the nuances of narrative comprehension and assimilation, our approach provides a comprehensive framework that unifies the causal network of a narrative, social context, and personal alignment. It paves a way for a deeper understanding and a more refined analysis of narrative adoption processes in varied contexts.
+
+\end{document}
