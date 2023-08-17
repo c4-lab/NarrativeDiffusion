@@ -5,27 +5,7 @@ import random
 import pandas as pd
 import json
 
-def main():
-    story_graph = nx.read_edgelist("config/story.edgelist",delimiter = ",")
-   
-    with open("config/storynodeprops.json") as f:
-        storyprops = json.load(f)
-    G = build_lattice_graph(30)
-    alignment_df = pd.DataFrame()
-    for sn in story_graph.nodes():
-        
-        alignments = []
-        for agentid, data in G.nodes(data=True):
-            if str(sn) in storyprops:
-                if storyprops[str(sn)] == data['color']:
-                    alignments.append(1.0)
-                else:
-                    alignments.append(-1.0)
-            else:
-                alignments.append(0)
-        alignment_df[sn] = alignments
-    
-    Simulation(story_graph=story_graph,social_graph=G,agent_alignments=alignment_df).run(50)
+
 
 
 def build_lattice_graph(n):
@@ -36,7 +16,7 @@ def build_lattice_graph(n):
         G.nodes[nodeid]["color"] = "blue"
     return G
 
-main()
+
 
 # This doesn't work
 def unfriendly_partition(G):
@@ -73,6 +53,23 @@ def build_cubic_graph(n):
     colors = unfriendly_partition(G)
     return G,colors
 
+def build_linear_graph(size):
+    """
+    Generate a linear graph with the given number of nodes.
+    
+    :param size: Number of nodes in the graph.
+    :return: A networkx Graph object representing the linear graph.
+    """
+    
+    # Create an empty graph
+    G = nx.Graph()
+    
+    # Add nodes and edges to create a linear structure
+    for i in range(size - 1):
+        G.add_edge(i, i+1)
+        
+    return G
+
 
 
 #G,colors = build_lattice_graph(30)
@@ -80,3 +77,38 @@ def build_cubic_graph(n):
 # G = nx.read_edgelist("story.edgelist",delimiter=",")
 # nx.draw(G,with_labels = True)
 # plt.show()
+def main_loom():
+    story_graph = nx.read_edgelist("config/story.edgelist",delimiter = ",")
+   
+    with open("config/storynodeprops.json") as f:
+        storyprops = json.load(f)
+    G = build_lattice_graph(30)
+    alignment_df = pd.DataFrame()
+    for sn in story_graph.nodes():
+        
+        alignments = []
+        for agentid, data in G.nodes(data=True):
+            if str(sn) in storyprops:
+                if storyprops[str(sn)] == data['color']:
+                    alignments.append(1.0)
+                else:
+                    alignments.append(-1.0)
+            else:
+                alignments.append(0)
+        alignment_df[sn] = alignments
+    
+    Simulation(story_graph=story_graph,social_graph=G,agent_alignments=alignment_df).run(50)
+
+
+def main_linear():
+    story_graph = build_linear_graph(18)
+    G = build_lattice_graph(50)
+    alignment_df = pd.DataFrame()
+    for sn in story_graph.nodes():
+        alignments = [0]*G.number_of_nodes()
+        alignment_df[sn] = alignments
+    
+    Simulation(story_graph=story_graph,social_graph=G,agent_alignments=alignment_df).run(50)
+
+
+main_linear()
