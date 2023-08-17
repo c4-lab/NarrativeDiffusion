@@ -1,5 +1,3 @@
-# NarrativeDiffusion
-
 # A Graph-Theoretical Approach to Information Adoption in Narrative Structures
 
 **Authors:**  
