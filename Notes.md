@@ -6,7 +6,7 @@ $$W(s_i) = \frac{1}{|S_t|} \sum_{s_j \in S_t} \frac{1}{d(s_i, s_j) + 1}$$
 
 <h1 style="color:red">ChatGPT</h1>
 
-Your definition captures a probabilistic measure $W(s_i)$ that describes the likelihood of an agent adopting a new story item $s_i$ given a set $S_t$ of story items that the agent has already adopted at a given time $t$. The function depends on the average similarity (or alternatively, distance $d(s_i, s_j)$) between the new item $s_i$ and the items $s_j$ in $S_t$.
+Your definition captures a probabilistic measure $W(s_i)$ that describes the likelihood of an agent adopting a new story item $s_i$ given a set $S_t$ of story items that the agent has already adopted at a given time $t$. The function depends on the average similarity (or alternatively, distance $d(s_i, s_j)$ ) between the new item $s_i$ and the items $s_j$ in $S_t$.
 
 The definition of $W(s_i)$ encapsulates a number of interesting elements:
 
