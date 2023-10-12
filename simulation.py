@@ -7,7 +7,7 @@ from agent import Agent
 import random
 
 class Simulation:
-    def __init__(self, params=None, story_graph=None, social_graph=None, agent_alignments=None):
+    def __init__(self, params=None, story_graph=None, social_graph=None):
         if params:
             # Directly assign parameters from the dictionary
             self.params = params
@@ -18,8 +18,7 @@ class Simulation:
         # Setting up graphs and agent alignments
         self.story_graph = story_graph
         self.social_graph = social_graph
-        self.agent_alignments = agent_alignments
-
+        
         # Create a results dataframe
         self.results = []
         self._initialize_agents()
@@ -39,9 +38,9 @@ class Simulation:
                 alpha=self.params["alpha"],
                 beta=self.params["beta"],
                 gamma=self.params["gamma"],
-                I_scale = self.params["I_scale"],
-                epsilon = self.params["epsilon"],
-                alignments=self.agent_alignments.iloc[agent_id].to_dict(),
+                I_scale=self.params['I_scale'],
+                k = self.params["k"],
+                story_nodes=list(self.story_graph.nodes()),
                 seed_adoptions = story_nodes[:self.params['seed']]
             )
             # Attach the agent to the node in the social graph
@@ -58,9 +57,9 @@ class Simulation:
             "alpha": config.getfloat("DEFAULT", "alpha"),
             "beta": config.getfloat("DEFAULT", "beta"),
             "gamma": config.getfloat("DEFAULT", "gamma"),
+            "I_scale": config.getfloat("DEFAULT", "I_scale"),
             "filestub": config.get("DEFAULT", "filestub"),
-            "I_scale": config.getfloat("DEFAULT","I_scale"),
-            "epsilon": config.getfloat("DEFAULT","epsilon"),
+            "k": config.getfloat("DEFAULT","k"),
             "viral" : config.getboolean("DEFAULT","viral"),
             "seed" : config.getint("DEFAULT", "seed"),
             "N": config.getint("DEFAULT", "N")
@@ -86,25 +85,25 @@ class Simulation:
                 # Iterate over agents
                 for agent_id, data in self.social_graph.nodes(data=True):
                     agent = data['agent']
-                    for story_item in self.agent_alignments.columns:
+                    for story_item in self.story_graph.nodes():
                         # Decide adoption and store the result
                         if agent.adopted_items[story_item]: 
                             self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': True,
-                                            'prob':None,'Narrative':None,"Social":None,"Alignment":None, "Trial":trial})
+                                            'prob':None,'Narrative':None,"Social":None, "Trial":trial})
                             continue
                         if self.params['viral']:
                             if not any([story_item in neighbor.adoptions() for neighbor in self.neighbors_of(agent_id)]):
                                 self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': False,
-                                            'prob':None,'Narrative':None,"Social":None,"Alignment":None, "Trial":trial})
+                                            'prob':None,'Narrative':None,"Social":None, "Trial":trial})
 
                                 continue
                         
                         
-                        adopted,prob,W_prime,I,A = agent.decide_adoption(story_item, self.story_graph, self.social_graph)
+                        adopted,prob,W,I = agent.decide_adoption(story_item, self.story_graph, self.social_graph)
                         if adopted:
                             agent.adopted_items[story_item] = True  # Update the adopted_items list of the agent.
                         self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': adopted,
-                                            'prob':prob,'Narrative':W_prime,"Social":I,"Alignment":A, "Trial":trial})
+                                            'prob':prob,'Narrative':W,"Social":I, "Trial":trial})
 
                 # Check if all items are adopted by checking the adopted_items list
                 all_adopted = all([data['agent'].all_adopted() for _, data in self.social_graph.nodes(data=True)])
@@ -136,4 +135,4 @@ class Simulation:
         # Note: You might need more sophisticated saving mechanisms depending on the actual data structure
         nx.write_gpickle(self.story_graph, os.path.join(directory, "story_graph.gpickle"))
         nx.write_gpickle(self.social_graph, os.path.join(directory, "social_graph.gpickle"))
-        self.agent_alignments.to_csv(os.path.join(directory, "agent_alignments.csv"), index=False)
+        

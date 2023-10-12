@@ -77,38 +77,40 @@ def build_linear_graph(size):
 # G = nx.read_edgelist("story.edgelist",delimiter=",")
 # nx.draw(G,with_labels = True)
 # plt.show()
-def main_loom():
-    story_graph = nx.read_edgelist("config/story.edgelist",delimiter = ",")
+
+# TODO: Need to fix this up to get rid of alignments
+# def main_loom():
+#     story_graph = nx.read_edgelist("config/story.edgelist",delimiter = ",")
    
-    with open("config/storynodeprops.json") as f:
-        storyprops = json.load(f)
-    G = build_lattice_graph(30)
-    alignment_df = pd.DataFrame()
-    for sn in story_graph.nodes():
+#     with open("config/storynodeprops.json") as f:
+#         storyprops = json.load(f)
+#     G = build_lattice_graph(30)
+#     alignment_df = pd.DataFrame()
+#     for sn in story_graph.nodes():
         
-        alignments = []
-        for agentid, data in G.nodes(data=True):
-            if str(sn) in storyprops:
-                if storyprops[str(sn)] == data['color']:
-                    alignments.append(1.0)
-                else:
-                    alignments.append(-1.0)
-            else:
-                alignments.append(0)
-        alignment_df[sn] = alignments
+#         alignments = []
+#         for agentid, data in G.nodes(data=True):
+#             if str(sn) in storyprops:
+#                 if storyprops[str(sn)] == data['color']:
+#                     alignments.append(1.0)
+#                 else:
+#                     alignments.append(-1.0)
+#             else:
+#                 alignments.append(0)
+#         alignment_df[sn] = alignments
     
-    Simulation(story_graph=story_graph,social_graph=G,agent_alignments=alignment_df).run(50)
+#     Simulation(story_graph=story_graph,social_graph=G,agent_alignments=alignment_df).run(50)
 
 
 def main_linear():
-    story_graph = build_linear_graph(18)
+    story_graph = build_linear_graph(10)
     G = build_lattice_graph(50)
     alignment_df = pd.DataFrame()
     for sn in story_graph.nodes():
         alignments = [0]*G.number_of_nodes()
         alignment_df[sn] = alignments
     
-    Simulation(story_graph=story_graph,social_graph=G,agent_alignments=alignment_df).run(50)
+    Simulation(story_graph=story_graph,social_graph=G).run(50)
 
 
 main_linear()
