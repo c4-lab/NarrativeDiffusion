@@ -3,14 +3,15 @@ import numpy as np
 
 
 class Agent:
-    def __init__(self, alpha, agent_id, beta, gamma, I_scale, k, story_nodes, seed_adoptions=None):
+    def __init__(self, agent_id, alpha, beta, gamma, I_scale, x_0, x_s, story_nodes, seed_adoptions=None):
         self.agent_id = agent_id
         self.story_nodes = story_nodes
         self.alpha = alpha
         self.beta = beta
         self.gamma = gamma
         self.I_scale = I_scale
-        self.k = k  # Field of vision
+        self.x_0 = x_0
+        self.x_s = x_s
 
         # Track adopted story items.
         self.adopted_items = {k: False for k in story_nodes}
@@ -33,12 +34,11 @@ class Agent:
         adopted_nodes = self.adoptions()
         if adopted_nodes:
             inverse_distances = [1/nx.shortest_path_length(content_graph, source=story_item, target=adopted_node) 
-                                 for adopted_node in adopted_nodes 
-                                 if nx.shortest_path_length(content_graph, source=story_item, target=adopted_node) <= self.k]
+                                 for adopted_node in adopted_nodes]
             unscaled_W = sum(inverse_distances) 
         else:
             unscaled_W = 0
-        W =  1 / (1 + np.exp(- (self.beta + self.gamma * unscaled_W)))
+        W =  1 / (1 + np.exp(- self.x_s * (self.beta + self.gamma * unscaled_W - self.x_0)))
         return W
 
     def adoption_probability(self, story_item, content_graph, social_graph):

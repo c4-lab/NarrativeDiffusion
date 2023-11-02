@@ -1,6 +1,7 @@
 import configparser
 import os
 import pandas as pd
+import json
 import networkx as nx
 from datetime import datetime
 from agent import Agent
@@ -18,6 +19,14 @@ class Simulation:
         # Setting up graphs and agent alignments
         self.story_graph = story_graph
         self.social_graph = social_graph
+        self.release_time = self.params["R"]
+        print("Story nodes",[n for n in self.story_graph.nodes()])
+        if len(self.release_time) < self.story_graph.number_of_nodes():
+            delta = (self.story_graph.number_of_nodes()-len(self.release_time))
+
+            self.release_time += delta * [self.params["R"][-1]]
+            print("Release time ",self.release_time)
+
         
         # Create a results dataframe
         self.results = []
@@ -39,7 +48,8 @@ class Simulation:
                 beta=self.params["beta"],
                 gamma=self.params["gamma"],
                 I_scale=self.params['I_scale'],
-                k = self.params["k"],
+                x_0 = self.params["x_0"],
+                x_s = self.params["x_s"],
                 story_nodes=list(self.story_graph.nodes()),
                 seed_adoptions = story_nodes[:self.params['seed']]
             )
@@ -58,11 +68,13 @@ class Simulation:
             "beta": config.getfloat("DEFAULT", "beta"),
             "gamma": config.getfloat("DEFAULT", "gamma"),
             "I_scale": config.getfloat("DEFAULT", "I_scale"),
+            "x_0": config.getfloat("DEFAULT","x_0"),
+            "x_s": config.getfloat("DEFAULT","x_s"),
             "filestub": config.get("DEFAULT", "filestub"),
-            "k": config.getfloat("DEFAULT","k"),
-            "viral" : config.getboolean("DEFAULT","viral"),
             "seed" : config.getint("DEFAULT", "seed"),
-            "N": config.getint("DEFAULT", "N")
+            #"viral" : config.getboolean("DEFAULT","viral"),
+            "N": config.getint("DEFAULT", "N"),
+            "R": json.loads(config.get("DEFAULT","R"))
         }
         return params
 
@@ -78,8 +90,6 @@ class Simulation:
 
             timestep = 0
             while timestep < self.params["N"]:
-                # if (timestep %100 == 0):
-                #     print("#",end=None)
                 all_adopted = True  # Start with the assumption that all items have been adopted
                 
                 # Iterate over agents
@@ -91,12 +101,17 @@ class Simulation:
                             self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': True,
                                             'prob':None,'Narrative':None,"Social":None, "Trial":trial})
                             continue
-                        if self.params['viral']:
-                            if not any([story_item in neighbor.adoptions() for neighbor in self.neighbors_of(agent_id)]):
-                                self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': False,
+                        if self.params['R'][story_item] > timestep:
+                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': False,
                                             'prob':None,'Narrative':None,"Social":None, "Trial":trial})
 
-                                continue
+                            continue
+                        # if self.params['viral']:
+                        #     if not any([story_item in neighbor.adoptions() for neighbor in self.neighbors_of(agent_id)]):
+                        #         self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': False,
+                        #                     'prob':None,'Narrative':None,"Social":None, "Trial":trial})
+
+                        #         continue
                         
                         
                         adopted,prob,W,I = agent.decide_adoption(story_item, self.story_graph, self.social_graph)
