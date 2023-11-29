@@ -9,12 +9,12 @@ import random
 
 class Simulation:
     def __init__(self, params=None, story_graph=None, social_graph=None):
-        if params:
-            # Directly assign parameters from the dictionary
-            self.params = params
-        else:
+        
             # Use configparser to load parameters from a properties file
-            self.params = self._load_params_from_file()
+        self.params = self._load_params_from_file()
+        if params:
+            for k,v in params.items():
+                self.params[k]=v
 
         # Setting up graphs and agent alignments
         self.story_graph = story_graph
