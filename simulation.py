@@ -8,10 +8,10 @@ from agent import Agent
 import random
 
 class Simulation:
-    def __init__(self, params=None, story_graph=None, social_graph=None):
+    def __init__(self, params=None, story_graph=None, social_graph=None, config_path="./config/simulation.properties"):
         
             # Use configparser to load parameters from a properties file
-        self.params = self._load_params_from_file()
+        self.params = self._load_params_from_file(config_path)
         if params:
             for k,v in params.items():
                 self.params[k]=v
@@ -57,10 +57,10 @@ class Simulation:
             del story_nodes[:self.params['seed']]
             self.social_graph.nodes[agent_id]["agent"] = agent
 
-    def _load_params_from_file(self, filename="simulation.properties"):
+    def _load_params_from_file(self, config_path):
         """Load parameters from a properties file using configparser."""
         config = configparser.ConfigParser()
-        config.read(f"./config/{filename}")
+        config.read(config_path)
         
         # Extract parameters and return as a dictionary
         params = {
