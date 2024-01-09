@@ -6,6 +6,7 @@ import networkx as nx
 from datetime import datetime
 from agent import Agent
 import random
+import pickle
 
 class Simulation:
     def __init__(self, params=None, story_graph=None, social_graph=None, config_path="./config/simulation.properties"):
@@ -148,6 +149,9 @@ class Simulation:
 
         # Save networks and alignments (assuming these are networkx graphs and pandas dataframes respectively)
         # Note: You might need more sophisticated saving mechanisms depending on the actual data structure
-        nx.write_gpickle(self.story_graph, os.path.join(directory, "story_graph.gpickle"))
-        nx.write_gpickle(self.social_graph, os.path.join(directory, "social_graph.gpickle"))
+        with open(os.path.join(directory, "story_graph.gpickle"),'wb') as f:
+            pickle.dump(self.story_graph, f, pickle.HIGHEST_PROTOCOL)
+
+        with open(os.path.join(directory, "social_graph.gpickle"),'wb') as f:
+            pickle.dump(self.social_graph, f, pickle.HIGHEST_PROTOCOL)
         
