@@ -99,12 +99,12 @@ class Simulation:
                     for story_item in self.story_graph.nodes():
                         # Decide adoption and store the result
                         if agent.adopted_items[story_item]: 
-                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': True,
-                                            'prob':None,'Narrative':None,"Social":None, "Trial":trial})
+                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'revealed': True, 'adopted': True,
+                                            'prob':None,'Narrative':None,"Social":None, "Trial":trial, "sequence": self.params["R"]})
                             continue
                         if self.params['R'][story_item] > timestep:
-                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': False,
-                                            'prob':None,'Narrative':None,"Social":None, "Trial":trial})
+                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'revealed': False, 'adopted': False,
+                                            'prob':None,'Narrative':None,"Social":None, "Trial":trial, "sequence": self.params["R"]})
 
                             continue
                         # if self.params['viral']:
@@ -118,8 +118,8 @@ class Simulation:
                         adopted,prob,W,I = agent.decide_adoption(story_item, self.story_graph, self.social_graph)
                         if adopted:
                             agent.adopted_items[story_item] = True  # Update the adopted_items list of the agent.
-                        self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': adopted,
-                                            'prob':prob,'Narrative':W,"Social":I, "Trial":trial})
+                        self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'revealed': True, 'adopted': adopted,
+                                            'prob':prob,'Narrative':W,"Social":I, "Trial":trial, "sequence": self.params["R"]})
 
                 # Check if all items are adopted by checking the adopted_items list
                 all_adopted = all([data['agent'].all_adopted() for _, data in self.social_graph.nodes(data=True)])
