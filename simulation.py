@@ -92,34 +92,31 @@ class Simulation:
             timestep = 0
             while timestep < self.params["N"]:
                 all_adopted = True  # Start with the assumption that all items have been adopted
-                
-                # Iterate over agents
+                adoption_decisions = {}  # Temporary structure to store adoption decisions
+
+                # Probability Evaluation Phase
                 for agent_id, data in self.social_graph.nodes(data=True):
                     agent = data['agent']
+                    adoption_decisions[agent_id] = {}
                     for story_item in self.story_graph.nodes():
-                        # Decide adoption and store the result
-                        if agent.adopted_items[story_item]: 
-                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': True,
-                                            'prob':None,'Narrative':None,"Social":None, "Trial":trial})
-                            continue
+                        # Check if story item is revealed
                         if self.params['R'][story_item] > timestep:
-                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': False,
-                                            'prob':None,'Narrative':None,"Social":None, "Trial":trial})
-
                             continue
-                        # if self.params['viral']:
-                        #     if not any([story_item in neighbor.adoptions() for neighbor in self.neighbors_of(agent_id)]):
-                        #         self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': False,
-                        #                     'prob':None,'Narrative':None,"Social":None, "Trial":trial})
-
-                        #         continue
-                        
-                        
-                        adopted,prob,W,I = agent.decide_adoption(story_item, self.story_graph, self.social_graph)
-                        if adopted:
-                            agent.adopted_items[story_item] = True  # Update the adopted_items list of the agent.
-                        self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': adopted,
-                                            'prob':prob,'Narrative':W,"Social":I, "Trial":trial})
+                        # Calculate adoption decision
+                        if not agent.adopted_items[story_item]:
+                            adopted, prob, W, I = agent.decide_adoption(story_item, self.story_graph, self.social_graph)
+                            adoption_decisions[agent_id][story_item] = adopted
+                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': adopted,
+                                            'prob':prob, 'Narrative':W, "Social":I, "Trial":trial})
+                        else:
+                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': True,
+                                            'prob':None, 'Narrative':None, "Social":None, "Trial":trial})
+                            
+                # State Update Phase
+                for agent_id in adoption_decisions:
+                        for story_item, adopted in adoption_decisions[agent_id].items():
+                            if adopted:
+                                self.social_graph.nodes[agent_id]['agent'].adopted_items[story_item] = True
 
                 # Check if all items are adopted by checking the adopted_items list
                 all_adopted = all([data['agent'].all_adopted() for _, data in self.social_graph.nodes(data=True)])
