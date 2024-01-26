@@ -65,8 +65,13 @@ def build_linear_graph(size):
     G = nx.Graph()
     
     # Add nodes and edges to create a linear structure
-    for i in range(size - 1):
-        G.add_edge(i, i+1)
+    # If the size is 1, add only one node and return
+
+    if size == 1:
+        G.add_node(0)
+    else:
+        for i in range(size - 1):
+            G.add_edge(i, i+1)
         
     return G
 
@@ -104,7 +109,7 @@ def build_linear_graph(size):
 
 def main_linear():
     story_graph = build_linear_graph(10)
-    G = build_lattice_graph(50)
+    G = build_linear_graph(1)
     alignment_df = pd.DataFrame()
     for sn in story_graph.nodes():
         alignments = [0]*G.number_of_nodes()
