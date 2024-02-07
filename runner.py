@@ -75,6 +75,37 @@ def build_linear_graph(size):
         
     return G
 
+def generate_tree(n, b):
+    """
+    Generates a tree graph with n nodes and branching factor b.
+    
+    Parameters:
+    - n: Total number of nodes.
+    - b: Branching factor.
+
+    Returns:
+    - G: A networkx graph.
+    """
+    if n < 1:
+        raise ValueError("The number of nodes, n, should be at least 1.")
+    if b < 1:
+        raise ValueError("The branching factor, b, should be at least 1.")
+
+    G = nx.Graph()
+    node_counter = 1
+    queue = [(0, 0)]  # (node, depth)
+    
+    while queue and node_counter < n:
+        current_node, depth = queue.pop(0)
+        for i in range(b):
+            if node_counter >= n:
+                break
+            child_node = node_counter
+            G.add_edge(current_node, child_node)
+            queue.append((child_node, depth + 1))
+            node_counter += 1
+
+    return G
 
 
 #G,colors = build_lattice_graph(30)
@@ -108,14 +139,14 @@ def build_linear_graph(size):
 
 
 def main_linear():
-    story_graph = build_linear_graph(10)
-    G = build_linear_graph(1)
+    story_graph = generate_tree(10, 2)
+    G = build_lattice_graph(50)
     alignment_df = pd.DataFrame()
     for sn in story_graph.nodes():
         alignments = [0]*G.number_of_nodes()
         alignment_df[sn] = alignments
     
-    Simulation(story_graph=story_graph,social_graph=G).run(50)
+    Simulation(story_graph=story_graph,social_graph=G).run(100)
 
 
 main_linear()
