@@ -98,16 +98,24 @@ class Simulation:
                 for agent_id, data in self.social_graph.nodes(data=True):
                     agent = data['agent']
                     adoption_decisions[agent_id] = {}
+
+                    # Determine which items to consider for adoption
+                    revealed_unadopted_items = [item for item in self.story_graph.nodes() if self.params['R'][item] <= timestep and not agent.adopted_items[item]]
+                    items_to_consider = set(random.sample(revealed_unadopted_items, min(3, len(revealed_unadopted_items))))
+                
                     for story_item in self.story_graph.nodes():
                         # Check if story item is revealed
                         if self.params['R'][story_item] > timestep:
                             continue
                         # Calculate adoption decision
-                        if not agent.adopted_items[story_item]:
+                        if story_item in items_to_consider:
                             adopted, prob, W, I = agent.decide_adoption(story_item, self.story_graph, self.social_graph)
                             adoption_decisions[agent_id][story_item] = adopted
                             self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': adopted,
                                             'prob':prob, 'Narrative':W, "Social":I, "Trial":trial})
+                        elif not agent.adopted_items[story_item]:
+                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': False,
+                                            'prob':None, 'Narrative':None, "Social":None, "Trial":trial})
                         else:
                             self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': True,
                                             'prob':None, 'Narrative':None, "Social":None, "Trial":trial})
