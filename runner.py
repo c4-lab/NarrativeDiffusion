@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import random
 import pandas as pd
 import json
+import numbers
 
 
 
@@ -138,8 +139,63 @@ def generate_tree(n, b):
 #     Simulation(story_graph=story_graph,social_graph=G,agent_alignments=alignment_df).run(50)
 
 
+def star_graph(n, create_using=None):
+    """Return the star graph
+
+    The star graph consists of one center node connected to n outer nodes.
+
+    Parameters
+    ----------
+    n : int or iterable
+        If an integer, node labels are 0 to n with center 0.
+        If an iterable of nodes, the center is the first.
+        Warning: n is not checked for duplicates and if present the
+        resulting graph may not be as desired. Make sure you have no duplicates.
+    create_using : NetworkX graph constructor, optional (default=nx.Graph)
+       Graph type to create. If graph instance, then cleared before populated.
+
+    Notes
+    -----
+    The graph has n+1 nodes for integer n.
+    So star_graph(3) is the same as star_graph(range(4)).
+    """
+    if isinstance(n, numbers.Integral):
+        nodes = range(n + 1)  # there should be n+1 nodes
+    elif hasattr(n, '__iter__'):  # Check if n is iterable
+        nodes = n
+    else:
+        raise ValueError("Parameter n must be an integer or an iterable")
+    
+    if create_using is None:
+        G = nx.Graph()
+    else:
+        G = create_using
+        G.clear()
+
+    if len(nodes) > 1:
+        hub = nodes[0]
+        spokes = nodes[1:]
+        G.add_edges_from((hub, node) for node in spokes)
+    return G
+
+def build_random_graph(n, p):
+    """
+    Generates a random graph using the Erdős-Rényi model.
+    
+    Parameters:
+    - n: Number of nodes in the graph.
+    - p: Probability for edge creation between two nodes.
+    
+    Returns:
+    - G: A networkx graph.
+    """
+    # Create a random graph
+    G = nx.erdos_renyi_graph(n, p)
+    
+    return G
+
 def main_linear():
-    story_graph = generate_tree(10, 2)
+    story_graph = build_random_graph(10, 0.3)
     G = build_lattice_graph(50)
     alignment_df = pd.DataFrame()
     for sn in story_graph.nodes():
