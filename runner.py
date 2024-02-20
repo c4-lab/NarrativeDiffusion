@@ -194,9 +194,14 @@ def build_random_graph(n, p):
     
     return G
 
+def small_world_graph(n):
+    G = nx.watts_strogatz_graph(n=n, k=4, p=0.1)
+    return G
+
+
 def main_linear():
-    story_graph = build_random_graph(10, 0.3)
-    G = build_lattice_graph(50)
+    story_graph = build_linear_graph(20)
+    G = small_world_graph(50)
     alignment_df = pd.DataFrame()
     for sn in story_graph.nodes():
         alignments = [0]*G.number_of_nodes()
