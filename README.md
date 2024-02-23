@@ -3,7 +3,9 @@
 **Authors:**
 
 **Una Joh** - Schoolo of Information Studies, Syracuse University, Hinds Hall, Syracuse, NY, 13244, USA. Email: sjoh01@syr.edu
+
 **Qiusi Sun** - School of Information Studies, Syracuse University, Hinds Hall, Syracuse, NY, 13244, USA. Email: qsun12@syr.edu 
+
 **Joshua Introne** - School of Information Studies, Syracuse University, Hinds Hall, Syracuse, NY, 13244, USA. Email: jeintron@syr.edu  
 
 **Abstract:** Something about narrative adoption in the context of misinformation.
