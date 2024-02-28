@@ -75,7 +75,8 @@ class Simulation:
             "seed" : config.getint("DEFAULT", "seed"),
             #"viral" : config.getboolean("DEFAULT","viral"),
             "N": config.getint("DEFAULT", "N"),
-            "R": json.loads(config.get("DEFAULT","R"))
+            "R": json.loads(config.get("DEFAULT","R")),
+            "bandwidth": json.loads(config.get("DEFAULT","bandwidth"))
         }
         return params
 
@@ -101,7 +102,7 @@ class Simulation:
 
                     # Determine which items to consider for adoption
                     revealed_unadopted_items = [item for item in self.story_graph.nodes() if self.params['R'][item] <= timestep and not agent.adopted_items[item]]
-                    items_to_consider = set(random.sample(revealed_unadopted_items, min(3, len(revealed_unadopted_items))))
+                    items_to_consider = set(random.sample(revealed_unadopted_items, min(self.params['bandwidth'], len(revealed_unadopted_items))))
                 
                     for story_item in self.story_graph.nodes():
                         # Check if story item is revealed
