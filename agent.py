@@ -3,7 +3,7 @@ import numpy as np
 
 
 class Agent:
-    def __init__(self, agent_id, alpha, beta, gamma, I_scale, x_0, x_s, story_nodes, seed_adoptions=None):
+    def __init__(self, agent_id, alpha, beta, gamma, I_scale, x_0, x_s, story_nodes, broadcast_schedule, seed_adoptions=None):
         self.agent_id = agent_id
         self.story_nodes = story_nodes
         self.alpha = alpha
@@ -12,6 +12,7 @@ class Agent:
         self.I_scale = I_scale
         self.x_0 = x_0
         self.x_s = x_s
+        self.broadcast_schedule = broadcast_schedule
 
         # Track adopted story items.
         self.adopted_items = {k: False for k in story_nodes}
@@ -41,20 +42,20 @@ class Agent:
         W =  1 / (1 + np.exp(- self.x_s * (self.beta + self.gamma * unscaled_W - self.x_0)))
         return W
 
-    def adoption_probability(self, story_item, content_graph, social_graph):
+    def adoption_probability(self, story_item, is_broadcasting, content_graph, social_graph):
         """Calculate the adoption probability for a story item."""
-        W = self.narrative_influence(story_item, content_graph)
+        W = self.narrative_influence(story_item, content_graph) if is_broadcasting else 0
         I = self.social_influence(story_item, social_graph)
 
         total_influence = self.alpha * W + (1-self.alpha) * I
         return total_influence, W, I
 
-    def decide_adoption(self, story_item, content_graph, social_graph):
+    def decide_adoption(self, story_item, is_broadcasting, content_graph, social_graph):
         """Decide whether to adopt a story item based on its adoption probability."""
         if self.adopted_items[story_item]:
-            return True
+            return True, 1.0, 1.0, 1.0
         else:
-            prob, W, I = self.adoption_probability(story_item, content_graph, social_graph)
+            prob, W, I = self.adoption_probability(story_item, is_broadcasting, content_graph, social_graph)
             return np.random.rand() <= prob, prob, W, I
 
     def all_adopted(self): 
