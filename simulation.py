@@ -49,12 +49,14 @@ class Simulation:
                 alpha=self.params["alpha"],
                 beta=self.params["beta"],
                 gamma=self.params["gamma"],
+                delta=self.params["delta"],
                 I_scale=self.params['I_scale'],
                 x_0 = self.params["x_0"],
                 x_s = self.params["x_s"],
                 story_nodes=list(self.story_graph.nodes()),
                 seed_adoptions = story_nodes[:self.params['seed']],
-                broadcast_schedule=self.broadcast_schedule
+                broadcast_schedule=self.broadcast_schedule,
+                current_timestep=0
             )
             # Attach the agent to the node in the social graph
             del story_nodes[:self.params['seed']]
@@ -70,6 +72,7 @@ class Simulation:
             "alpha": config.getfloat("DEFAULT", "alpha"),
             "beta": config.getfloat("DEFAULT", "beta"),
             "gamma": config.getfloat("DEFAULT", "gamma"),
+            "delta": config.getfloat("DEFAULT", "delta"),
             "I_scale": config.getfloat("DEFAULT", "I_scale"),
             "x_0": config.getfloat("DEFAULT","x_0"),
             "x_s": config.getfloat("DEFAULT","x_s"),
@@ -77,8 +80,7 @@ class Simulation:
             "seed" : config.getint("DEFAULT", "seed"),
             #"viral" : config.getboolean("DEFAULT","viral"),
             "N": config.getint("DEFAULT", "N"),
-            "R": json.loads(config.get("DEFAULT","R")),
-            "bandwidth": json.loads(config.get("DEFAULT","bandwidth"))
+            "R": json.loads(config.get("DEFAULT","R"))
         }
         return params
 
@@ -93,6 +95,10 @@ class Simulation:
             self._initialize_agents()  # Reinitialize agents with new seed stories for each trial
 
             for timestep in range(self.params["N"]):
+                for _, data in self.social_graph.nodes(data=True):
+                    agent = data['agent']
+                    agent.update_current_timestep(timestep)
+
                 # Temporary structure to store adoption decisions
                 adoption_decisions = {}  # Temporary structure to store adoption decisions
 
