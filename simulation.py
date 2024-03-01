@@ -7,6 +7,7 @@ from datetime import datetime
 from agent import Agent
 import random
 import pickle
+import time
 
 class Simulation:
     def __init__(self, params=None, story_graph=None, social_graph=None, config_path="./config/simulation.properties"):
@@ -84,9 +85,9 @@ class Simulation:
 
     def run(self,num_trials =1):
         """Run the simulation for N timesteps or until all agents have adopted all story items."""
-        
+        print(f"Running {num_trials} trials.")
         for trial in range(num_trials):
-            print(f"Running trial {trial+1}...")
+            print(".",end="")
             self._initialize_agents()  # Reinitialize agents with new seed stories for each trial
 
             timestep = 0
@@ -133,7 +134,7 @@ class Simulation:
                     break
                 
                 timestep += 1
-            
+        print("Saving")    
         self.save_results()
 
     def save_results(self):
@@ -144,8 +145,17 @@ class Simulation:
         # Create the directory
         os.makedirs(directory, exist_ok=True)
 
-        # Save results
-        pd.DataFrame(self.results).to_csv(os.path.join(directory, "results.csv"), index=False)
+        # # Save results
+        # start = time.time()
+        # df = pd.DataFrame(self.results)
+        # print(f"Created dataframe in {time.time()-start} seconds")
+        
+        # start = time.time()
+        # df.to_feather(os.path.join(directory, "results.feather"), index=False)
+        # print(f"Wrote file in {time.time()-start} seconds")
+
+        with open(os.path.join(directory, "results.pkl"), 'wb') as file:
+            pickle.dump(self.results, file)
         
         # Save parameters
         with open(os.path.join(directory, "parameters.txt"), "w") as f:
