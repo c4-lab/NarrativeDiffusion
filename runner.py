@@ -195,19 +195,35 @@ def build_random_graph(n, p):
     return G
 
 def small_world_graph(n):
-    G = nx.watts_strogatz_graph(n=n, k=4, p=0.1)
+    G = nx.watts_strogatz_graph(n=n, k=4, p=0.5)
     return G
 
+def create_custom_graph():
+    # Create an empty graph
+    G = nx.Graph()
+    
+    # Add 20 nodes. Assuming nodes are labeled from 1 to 20 (story 0 as dummy)
+    G.add_nodes_from(range(21))
+    
+    # Manually add edges. Each tuple represents a link between two nodes.
+    edges = [(1,2), (2,3), (3,4), (4,5), (5,6), (5, 7), (5, 8),
+             (7,8), (8,9), (8,10), (8,11), (8,12), (9,13), (10,12), (10,15),
+             (11,14), (12,13), (12, 16), (16,17), (16,18), (18,19), (19,20)]
+    
+    # Add edges to the graph
+    G.add_edges_from(edges)
+    
+    return G
 
 def main_linear():
-    story_graph = build_linear_graph(20)
+    story_graph = create_custom_graph()
     G = small_world_graph(50)
     alignment_df = pd.DataFrame()
     for sn in story_graph.nodes():
         alignments = [0]*G.number_of_nodes()
         alignment_df[sn] = alignments
     
-    Simulation(story_graph=story_graph,social_graph=G).run(100)
+    Simulation(story_graph=story_graph,social_graph=G).run(50)
 
 
 main_linear()

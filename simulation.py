@@ -8,6 +8,7 @@ from agent import Agent
 import random
 import pickle
 import time
+from collections import defaultdict
 
 class Simulation:
     def __init__(self, params=None, story_graph=None, social_graph=None, config_path="./config/simulation.properties"):
@@ -18,17 +19,17 @@ class Simulation:
             for k,v in params.items():
                 self.params[k]=v
 
+        # Convert the R parameter from JSON string to list of tuples
+        self.params["R"] = json.loads(self.params["R"])
+
         # Setting up graphs and agent alignments
         self.story_graph = story_graph
         self.social_graph = social_graph
-        self.release_time = self.params["R"]
-        print("Story nodes",[n for n in self.story_graph.nodes()])
-        if len(self.release_time) < self.story_graph.number_of_nodes():
-            delta = (self.story_graph.number_of_nodes()-len(self.release_time))
 
-            self.release_time += delta * [self.params["R"][-1]]
-            print("Release time ",self.release_time)
-
+        # Convert list of tuples into broadcasting schedule dictionary
+        self.broadcast_schedule = defaultdict(list)
+        for item, timestep in self.params["R"]:
+            self.broadcast_schedule[timestep].append(item)
         
         # Create a results dataframe
         self.results = []
@@ -49,11 +50,13 @@ class Simulation:
                 alpha=self.params["alpha"],
                 beta=self.params["beta"],
                 gamma=self.params["gamma"],
+                phi = self.params["phi"],
+                max_item_relevance=self.params["max_item_relevance"],
                 I_scale=self.params['I_scale'],
                 x_0 = self.params["x_0"],
                 x_s = self.params["x_s"],
                 story_nodes=list(self.story_graph.nodes()),
-                seed_adoptions = story_nodes[:self.params['seed']]
+                seed_adoptions = story_nodes[:self.params['seed']],
             )
             # Attach the agent to the node in the social graph
             del story_nodes[:self.params['seed']]
@@ -69,6 +72,8 @@ class Simulation:
             "alpha": config.getfloat("DEFAULT", "alpha"),
             "beta": config.getfloat("DEFAULT", "beta"),
             "gamma": config.getfloat("DEFAULT", "gamma"),
+            "phi": config.getfloat("DEFAULT","phi"),
+            "max_item_relevance": config.getfloat("DEFAULT", "max_item_relevance"),
             "I_scale": config.getfloat("DEFAULT", "I_scale"),
             "x_0": config.getfloat("DEFAULT","x_0"),
             "x_s": config.getfloat("DEFAULT","x_s"),
@@ -89,52 +94,53 @@ class Simulation:
         for trial in range(num_trials):
             print(".",end="")
             self._initialize_agents()  # Reinitialize agents with new seed stories for each trial
+            relevant_items = dict()
+            for timestep in range(self.params["N"]):
 
-            timestep = 0
-            while timestep < self.params["N"]:
-                all_adopted = True  # Start with the assumption that all items have been adopted
+
+                # Temporary structure to store adoption decisions
                 adoption_decisions = {}  # Temporary structure to store adoption decisions
 
-                # Probability Evaluation Phase
-                for agent_id, data in self.social_graph.nodes(data=True):
-                    agent = data['agent']
-                    adoption_decisions[agent_id] = {}
-
-                    # Determine which items to consider for adoption
-                    revealed_unadopted_items = [item for item in self.story_graph.nodes() if self.params['R'][item] <= timestep and not agent.adopted_items[item]]
-                    items_to_consider = set(random.sample(revealed_unadopted_items, min(3, len(revealed_unadopted_items))))
-                
-                    for story_item in self.story_graph.nodes():
-                        # Check if story item is revealed
-                        if self.params['R'][story_item] > timestep:
-                            continue
-                        # Calculate adoption decision
-                        if story_item in items_to_consider:
-                            adopted, prob, W, I = agent.decide_adoption(story_item, self.story_graph, self.social_graph)
-                            adoption_decisions[agent_id][story_item] = adopted
-                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': adopted,
-                                            'prob':prob, 'Narrative':W, "Social":I, "Trial":trial})
-                        elif not agent.adopted_items[story_item]:
-                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': False,
-                                            'prob':None, 'Narrative':None, "Social":None, "Trial":trial})
+                relevant_items.update({item:timestep for item in self.broadcast_schedule.get(timestep, [])})
+                #print(f"Relevant items are: {relevant_items}")
+                # Step 1: Collect Decisions
+                for story_item in self.story_graph.nodes():
+                    if story_item in relevant_items and timestep - relevant_items[story_item] > self.params['max_item_relevance']:
+                        del relevant_items[story_item]
+                    
+                    for agent_id, data in self.social_graph.nodes(data=True):
+                        agent = data['agent']
+                        if agent_id not in adoption_decisions:
+                            adoption_decisions[agent_id] = {}
+                        
+                        if story_item not in relevant_items:
+                            #print(f"Not relevant: {story_item}")
+                            adoption_decisions[agent_id][story_item] = (agent.adoption_status(story_item),0,0,0)
                         else:
-                            self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': True,
-                                            'prob':None, 'Narrative':None, "Social":None, "Trial":trial})
+                            item_age = timestep - relevant_items[story_item]
+                            #print(f"Relevant: {story_item} - age {item_age}")
                             
-                # State Update Phase
-                for agent_id in adoption_decisions:
-                        for story_item, adopted in adoption_decisions[agent_id].items():
-                            if adopted:
-                                self.social_graph.nodes[agent_id]['agent'].adopted_items[story_item] = True
+                            adopt, prob, W, I = agent.decide_adoption(story_item, item_age, self.story_graph, self.social_graph)
+                            adoption_decisions[agent_id][story_item] = (adopt, prob, W, I)
 
-                # Check if all items are adopted by checking the adopted_items list
+                # Step 2: Apply Decisions
+                for agent_id, decisions in adoption_decisions.items():
+                    for story_item, (adopt, _, _, _) in decisions.items():
+                        if adopt:
+                            self.social_graph.nodes[agent_id]['agent'].adopted_items[story_item] = True
+
+                # Record results after decisions are applied
+                for agent_id, decisions in adoption_decisions.items():
+                    for story_item, (adopt, prob, W, I) in decisions.items():
+                        self.results.append({'agent': agent_id, 'timestep': timestep, 'story_item': story_item, 'adopted': adopt, 
+                                             'prob': prob, 'Narrative': W, "Social": I, "Trial": trial})
+
+
+                # Check if all items are adopted
                 all_adopted = all([data['agent'].all_adopted() for _, data in self.social_graph.nodes(data=True)])
-
                 if all_adopted:
                     break
-                
-                timestep += 1
-        print("Saving")    
+
         self.save_results()
 
     def save_results(self):
